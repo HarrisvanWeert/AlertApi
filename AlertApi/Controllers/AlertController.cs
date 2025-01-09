@@ -44,6 +44,51 @@
         }
 
         /// <summary>
+        /// The GetAlert
+        /// </summary>
+        /// <param name="id">The id<see cref="int"/></param>
+        /// <returns>The <see cref="Task{ActionResult{Alert}}"/></returns>
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<ActionResult<Alert>> GetAlert(int id)
+        {
+            var alert = await _context.Alerts.FirstOrDefaultAsync(a => a.AlertID == id);
+
+            if (alert == null)
+            {
+                return NotFound("Alert not found.");
+            }
+
+            return Ok(alert);
+        }
+
+        /// <summary>
+        /// The GetAlertsByAlertType
+        /// </summary>
+        /// <param name="AlertType">The AlertType<see cref="string"/></param>
+        /// <returns>The <see cref="Task{ActionResult{List{Alert}}}"/></returns>
+        [HttpGet("AlertType/{AlertType}")]
+        public async Task<ActionResult<List<Alert>>> GetAlertsByAlertType(string AlertType)
+        {
+
+            if (string.IsNullOrWhiteSpace(AlertType))
+            {
+                return BadRequest("Alert type is required.");
+            }
+
+            var AlertTypes = await _context.Alerts
+                .Where(a => EF.Functions.Like(a.WebsiteName, $"%{AlertType}%"))
+                .ToListAsync();
+
+            if (!AlertTypes.Any())
+            {
+                return NotFound($"No Alerts found for the AlertType: {AlertType}");
+            }
+
+            return Ok(AlertTypes);
+        }
+
+        /// <summary>
         /// The CreateAlert
         /// </summary>
         /// <param name="alert">The alert<see cref="Alert"/></param>
@@ -106,6 +151,27 @@
             await _context.SaveChangesAsync();
 
             return Ok(existingAlert);
+        }
+
+        /// <summary>
+        /// The DeleteAlert
+        /// </summary>
+        /// <param name="id">The id<see cref="int"/></param>
+        /// <returns>The <see cref="Task{ActionResult}"/></returns>
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteAlert(int id)
+        {
+            var alert = await _context.Alerts.FirstOrDefaultAsync(a => a.AlertID == id);
+
+            if (alert == null)
+            {
+                return NotFound("Alert not found.");
+            }
+
+            _context.Alerts.Remove(alert);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { alert, message = "was deleted" });
         }
     }
 }
