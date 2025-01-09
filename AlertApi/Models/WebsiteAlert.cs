@@ -11,4 +11,5 @@
         public Website Website { get; set; }
         public Alert Alert { get; set; }
     }
+
 }
