@@ -1,6 +1,7 @@
 ﻿namespace AlertApi.Controllers
 {
     using AlertApi.Data;
+    using AlertApi.Dto;
     using AlertApi.Models;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
@@ -77,7 +78,7 @@
             }
 
             var AlertTypes = await _context.Alerts
-                .Where(a => EF.Functions.Like(a.WebsiteName, $"%{AlertType}%"))
+                .Where(a => EF.Functions.Like(a.AlertType, $"%{AlertType}%"))
                 .ToListAsync();
 
             if (!AlertTypes.Any())
@@ -93,27 +94,7 @@
         /// </summary>
         /// <param name="alert">The alert<see cref="Alert"/></param>
         /// <returns>The <see cref="Task{ActionResult{Alert}}"/></returns>
-        [HttpPost]
-        public async Task<ActionResult<Alert>> CreateAlert([FromBody] Alert alert)
-        {
-
-            if (alert == null)
-            {
-                return BadRequest("Alert data is required.");
-            }
-
-            if (string.IsNullOrWhiteSpace(alert.AlertMessage))
-            {
-                return BadRequest("Alert message cannot be empty.");
-            }
-            alert.CreatedAt = DateTime.UtcNow;
-            alert.UpdatedAt = DateTime.UtcNow;
-
-            _context.Alerts.Add(alert);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetAllAlerts), new { id = alert.AlertID }, alert);
-        }
+        
 
         /// <summary>
         /// The UpdateAlert
@@ -173,5 +154,39 @@
 
             return Ok(new { alert, message = "was deleted" });
         }
+
+        [HttpPost]
+        public async Task<ActionResult<Alert>> CreateAlert([FromBody] AlertCreateDto alertDto)
+        {
+            if (alertDto == null)
+            {
+                return BadRequest("Alert data is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(alertDto.AlertMessage))
+            {
+                return BadRequest("Alert message cannot be empty.");
+            }
+
+           
+            var alert = new Alert
+            {
+                AlertMessage = alertDto.AlertMessage,
+                AlertType = alertDto.AlertType,
+                StartTime = alertDto.StartTime,
+                EndTime = alertDto.EndTime,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _context.Alerts.Add(alert);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetAllAlerts), new { id = alert.AlertID }, alert);
+        }
+
+
+
+
     }
 }

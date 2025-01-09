@@ -14,5 +14,15 @@ namespace AlertApi.Data
         public DbSet<Website> Websites { get; set; }
         public DbSet<Alert> Alerts { get; set; }
         public DbSet<WebsiteAlert> WebsiteAlerts { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<WebsiteAlert>()
+                .HasOne(wa => wa.Website)
+                .WithMany(w => w.WebsiteAlerts)
+                .HasForeignKey(wa => wa.WebsiteID);
+        }
     }
 }

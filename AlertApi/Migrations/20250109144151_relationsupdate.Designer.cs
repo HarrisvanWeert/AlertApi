@@ -4,6 +4,7 @@ using AlertApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AlertApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250109144151_relationsupdate")]
+    partial class relationsupdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,10 +37,6 @@ namespace AlertApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("AlertType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -49,6 +48,10 @@ namespace AlertApi.Migrations
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("WebsiteName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("AlertID");
 
@@ -122,7 +125,7 @@ namespace AlertApi.Migrations
             modelBuilder.Entity("AlertApi.Models.WebsiteAlert", b =>
                 {
                     b.HasOne("AlertApi.Models.Alert", "Alert")
-                        .WithMany()
+                        .WithMany("WebsiteAlerts")
                         .HasForeignKey("AlertID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -136,6 +139,11 @@ namespace AlertApi.Migrations
                     b.Navigation("Alert");
 
                     b.Navigation("Website");
+                });
+
+            modelBuilder.Entity("AlertApi.Models.Alert", b =>
+                {
+                    b.Navigation("WebsiteAlerts");
                 });
 
             modelBuilder.Entity("AlertApi.Models.Website", b =>
