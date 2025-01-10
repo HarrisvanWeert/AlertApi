@@ -5,7 +5,7 @@
         public int WebsiteAlertID { get; set; }
         public int WebsiteID { get; set; }
         public int AlertID { get; set; }
-        public string Status { get; set; }
+        public string Status { get; set; } = "DefaultStatus";
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 

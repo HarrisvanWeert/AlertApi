@@ -94,7 +94,12 @@
         /// </summary>
         /// <param name="alert">The alert<see cref="Alert"/></param>
         /// <returns>The <see cref="Task{ActionResult{Alert}}"/></returns>
-        
+
+        /// <summary>
+        /// The CreateAlert
+        /// </summary>
+        /// <param name="alert">The alert<see cref="Alert"/></param>
+        /// <returns>The <see cref="Task{ActionResult{Alert}}"/></returns>
 
         /// <summary>
         /// The UpdateAlert
@@ -155,6 +160,11 @@
             return Ok(new { alert, message = "was deleted" });
         }
 
+        /// <summary>
+        /// The CreateAlert
+        /// </summary>
+        /// <param name="alertDto">The alertDto<see cref="AlertCreateDto"/></param>
+        /// <returns>The <see cref="Task{ActionResult{Alert}}"/></returns>
         [HttpPost]
         public async Task<ActionResult<Alert>> CreateAlert([FromBody] AlertCreateDto alertDto)
         {
@@ -168,7 +178,6 @@
                 return BadRequest("Alert message cannot be empty.");
             }
 
-           
             var alert = new Alert
             {
                 AlertMessage = alertDto.AlertMessage,
@@ -184,9 +193,5 @@
 
             return CreatedAtAction(nameof(GetAllAlerts), new { id = alert.AlertID }, alert);
         }
-
-
-
-
     }
 }
