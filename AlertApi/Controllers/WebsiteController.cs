@@ -1,6 +1,7 @@
 ﻿namespace AlertApi.Controllers
 {
     using AlertApi.Data;
+    using AlertApi.Dto;
     using AlertApi.Models;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
@@ -31,23 +32,32 @@
         /// </summary>
         /// <param name="website">The website<see cref="Website"/></param>
         /// <returns>The <see cref="Task{ActionResult{Alert}}"/></returns>
+
+
         [HttpPost]
-        public async Task<ActionResult<Alert>> CreateWebsite([FromBody] Website website)
+        public async Task<ActionResult<Alert>> CreateWebsite([FromBody] WebsiteCreateDto websiteDto)
         {
 
-            if (website == null)
+            if (websiteDto == null)
             {
-                return BadRequest("Alert data is required.");
+                return BadRequest("No website found");
             }
 
-            website.CreatedAt = DateTime.UtcNow;
-            website.UpdatedAt = DateTime.UtcNow;
+            var website = new Website
+            {
+                WebsiteName = websiteDto.WebsiteName,
+                WebsiteUrl = websiteDto.WebsiteUrl,
+                Status = websiteDto.Status,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
 
             _context.Websites.Add(website);
             await _context.SaveChangesAsync();
 
-            return Ok("created succesfully");
+            return CreatedAtAction(nameof(GetAllWebsites),new {id = website.WebsiteID},website);
         }
+
 
         /// <summary>
         /// The GetAllWebsites
@@ -144,10 +154,6 @@
 
             return Ok(new { website, message = "was deleted" });
         }
-
-
-
-
 
     }
 }
